@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Models\"/>
         <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
 
@@ -23,6 +22,11 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
         <PackageReference Include="Discord.Net" Version="3.14.1" />
+        <PackageReference Include="Discord.Net.Rest" Version="3.14.1" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Helpers\" />
     </ItemGroup>
 </Project>

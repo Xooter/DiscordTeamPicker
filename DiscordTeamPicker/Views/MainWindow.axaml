@@ -12,5 +12,28 @@
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
+    <StackPanel>
+        
+<!-- <controls:FAComboBox/> -->
+<!-- <controls:FAComboBox/> -->
+<ItemsControl ItemsSource="{Binding Users}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <StackPanel>
+                <Border ClipToBounds="True"  
+                        Height="128"
+                        Width="128">
+                    <Image 
+                        Width="128"
+                        Height="128"
+                        Stretch="UniformToFill"
+                        Source="{Binding Avatar}"/>
+                </Border>
+                <TextBlock Text="{Binding User.Username}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
 
+    </StackPanel>
 </Window>
