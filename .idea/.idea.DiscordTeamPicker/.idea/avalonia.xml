@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="DiscordTeamPicker/App.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/MainWindow.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

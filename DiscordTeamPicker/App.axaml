@@ -2,14 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="DiscordTeamPicker.App"
              xmlns:local="using:DiscordTeamPicker"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>
-        <FluentTheme />
+        <styling:FluentAvaloniaTheme /> 
     </Application.Styles>
 </Application>
