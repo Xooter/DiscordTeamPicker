@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.Input;
 using Discord;
 using Discord.WebSocket;
 using DiscordTeamPicker.Helpers;
@@ -12,11 +13,11 @@ using DiscordTeamPicker.Models;
 
 namespace DiscordTeamPicker.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase
 {
     private DiscordSocketClient _client =new(); 
     public ObservableCollection<DiscordUser> Users { get; set; } = [];
-    public ObservableCollection<List<DiscordUser>> Teams { get; set; } = [];
+    public ObservableCollection<Team> Teams { get; set; } = [];
 
     public MainWindowViewModel()
     {
@@ -52,8 +53,8 @@ public class MainWindowViewModel : ViewModelBase
             {
                 var usersInChannel = channel.GetUsersAsync().FlattenAsync();
                 var filteredUsers = usersInChannel.Result
-                                          .Where(x => !x.IsBot &&
-                                                             x.VoiceChannel.Id == channelId);
+                                                  .Where(x => !x.IsBot &&
+                                                              x.VoiceChannel.Id == channelId);
                 
                 foreach (var user in filteredUsers)
                 {
@@ -106,24 +107,24 @@ public class MainWindowViewModel : ViewModelBase
     
     // async void ShuffleUsers()
     // {
-        // var checkedItems = UsersList.CheckedItems;
-        //
-        // List<IUser?> CheckedUsers = users.Where(x => checkedItems.Contains(x.Username)).ToList();
-        //
-        // ClearLists();
-        //
-        // Random rnd = new Random();
-        // ListTeam1 = CheckedUsers.OrderBy(x => rnd.Next()).Take(CheckedUsers.Count / 2).ToList();
-        // ListTeam2 = CheckedUsers.Except(ListTeam1).ToList();
-        // foreach (var item in ListTeam1)
-        // {
-        //     Team1.Items.Add(item.Username);
-        // }
-        //
-        // foreach (var item in ListTeam2)
-        // {
-        //     Team2.Items.Add(item.Username);
-        // }
+    // var checkedItems = UsersList.CheckedItems;
+    //
+    // List<IUser?> CheckedUsers = users.Where(x => checkedItems.Contains(x.Username)).ToList();
+    //
+    // ClearLists();
+    //
+    // Random rnd = new Random();
+    // ListTeam1 = CheckedUsers.OrderBy(x => rnd.Next()).Take(CheckedUsers.Count / 2).ToList();
+    // ListTeam2 = CheckedUsers.Except(ListTeam1).ToList();
+    // foreach (var item in ListTeam1)
+    // {
+    //     Team1.Items.Add(item.Username);
+    // }
+    //
+    // foreach (var item in ListTeam2)
+    // {
+    //     Team2.Items.Add(item.Username);
+    // }
     // }
     
     // async void MoveParticipants(List<IUser?> team, ulong channelToMove)
@@ -136,4 +137,16 @@ public class MainWindowViewModel : ViewModelBase
     //         await guildUser.ModifyAsync(x => x.ChannelId = channel.Id);
     //     }
     // }
+    
+    [RelayCommand]
+    void NewTeam()
+    {
+        Teams.Add(new Team(){Users = Users.ToList()});
+    }
+
+    [RelayCommand]
+    void RemoveTeam(Team team)
+    {
+        
+    }
 }

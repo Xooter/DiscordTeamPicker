@@ -3,6 +3,8 @@
         xmlns:vm="using:DiscordTeamPicker.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:DiscordTeamPicker.Models"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="DiscordTeamPicker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -13,31 +15,116 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
     <Window.Resources>
+        <DataTemplate x:Key="User" x:DataType="models:DiscordUser">
+            <StackPanel Width="70">
+                <Border ClipToBounds="True"
+                        CornerRadius="32"
+                        Height="64"
+                        Width="64">
+                    <Image
+                        Width="64"
+                        Height="64"
+                        Stretch="UniformToFill"
+                        Source="{Binding Avatar}" />
+                </Border>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Center"
+                    Text="{Binding User.Username}" />
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
-    
-    <StackPanel>
-        <ItemsControl ItemsSource="{Binding Users}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Width="70" Height="70">
-                        <Border ClipToBounds="True"
-                                CornerRadius="32"
-                                Height="64"
-                                Width="64">
-                            <Image
-                                Width="64"
-                                Height="64"
-                                Stretch="UniformToFill"
-                                Source="{Binding Avatar}" />
-                        </Border>
-                        <TextBlock 
-                            TextWrapping="Wrap"
-                            HorizontalAlignment="Center"
-                            Text="{Binding User.Username}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
+
+    <Grid
+        RowDefinitions="Auto Auto *"
+        Margin="20">
+        <ItemsControl ItemsSource="{Binding Users}"
+                      ItemTemplate="{StaticResource User}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-    </StackPanel>
+        <Button Grid.Row="1" Command="{Binding NewTeamCommand}">Nuevo Team</Button>
+
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding Teams}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#1e1e1e"
+                                Margin="5"
+                                CornerRadius="5">
+                            <StackPanel Width="400"
+                                        Margin="10">
+                                <TextBlock
+                                    Text="{Binding Name}"
+                                    HorizontalAlignment="Center" />
+                                <Separator Margin="20 5"/>
+                                <Grid ColumnDefinitions="3* *"
+                                      Margin="10"
+                                      HorizontalAlignment="Stretch">
+                                    <controls:FAComboBox HorizontalAlignment="Stretch" />
+                                    <Button Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Classes="accent"
+                                            Margin="10 0 0 0">
+                                        <controls:SymbolIcon Symbol="Delete" />
+                                    </Button>
+                                </Grid>
+
+                                <ItemsControl ItemsSource="{Binding Users}"
+                                              Margin="10"
+                                              ItemTemplate="{StaticResource User}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                
+                                <Grid ColumnDefinitions="* * *"
+                                      Margin="10"
+                                      HorizontalAlignment="Stretch">
+                                    <Button Grid.Column="0"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <TextBlock>Bloquear</TextBlock>
+                                        <controls:SymbolIcon Symbol="LikeFilled" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Margin="10 0 0 0">
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <TextBlock>Mutear</TextBlock>
+                                        <controls:SymbolIcon Symbol="SpeakerMuteFilled" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Grid.Column="2"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Margin="10 0 0 0">
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <TextBlock>Mover</TextBlock>
+                                        <controls:SymbolIcon Symbol="Go" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
 </Window>
