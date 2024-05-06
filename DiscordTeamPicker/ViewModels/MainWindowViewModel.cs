@@ -164,12 +164,25 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     void NewTeam()
     {
-        Teams.Add(new Team(){Users = Users.ToList()});
+        if (Teams.Count < 10)
+        {
+            var availableChannels =GuildChannels 
+                                    .Where(chan => Teams.All(team => team.Channel != chan))  
+                                    .ToList();
+
+            SocketGuildChannel selectedChannel = availableChannels.FirstOrDefault(); 
+            
+            Teams.Add(new Team()
+            {
+                Users = Users.ToList(),
+                Channel = selectedChannel
+            });
+        }
     }
 
     [RelayCommand]
     void RemoveTeam(Team team)
     {
-        
+        Teams.Remove(team);
     }
 }

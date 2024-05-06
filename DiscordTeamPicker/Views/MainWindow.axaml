@@ -74,6 +74,7 @@
                                       HorizontalAlignment="Stretch">
                                     <controls:FAComboBox
                                         IsTextSearchEnabled="True"
+                                        SelectedValue="{Binding Channel}"
                                         ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).GuildChannels,ElementName=Window}"
                                         HorizontalAlignment="Stretch">
                                         <controls:FAComboBox.ItemTemplate>
@@ -85,6 +86,8 @@
                                     <Button Grid.Column="1"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Stretch"
+                                            Command="{Binding ((vm:MainWindowViewModel)DataContext).RemoveTeamCommand,ElementName=Window}"
+                                            CommandParameter="{Binding .}"
                                             Classes="accent"
                                             Margin="10 0 0 0">
                                         <controls:SymbolIcon Symbol="Delete" />
