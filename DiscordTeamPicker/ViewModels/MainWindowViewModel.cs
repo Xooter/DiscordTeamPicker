@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ViewModelBase
             var guild = channel.Guild;
             var channels = await guild.GetChannelsAsync();
             
-            GuildAvatar = await DownloadGuildAvatar(guild.IconUrl);
+            GuildAvatar = await DownloadAvatar(guild.IconUrl);
 
             var orderedTextChannels = channels
                                       .OfType<SocketTextChannel>()
@@ -126,10 +126,17 @@ public partial class MainWindowViewModel : ViewModelBase
                     var activeUser = channel.GetUserAsync(user.Id);
                     if (activeUser.Result is { IsBot: false })
                     {
+        string url = "https://cdn.discordapp.com/avatars/" +
+                     user.Id +
+                     "/" +
+                     user.AvatarId +
+                     ".png?size=128 ";
                         DiscordUser newUser = new DiscordUser()
                         {
                             User = activeUser.Result  as SocketGuildUser,
-                            Avatar = await DownloadAvatar(activeUser.Result as SocketGuildUser)
+                            
+        
+                            Avatar = await DownloadAvatar(url)
                         };
                        
                         Users.Add(newUser);
@@ -138,39 +145,8 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
     }
-    private async Task<Bitmap> DownloadGuildAvatar(string url)
+    private async Task<Bitmap> DownloadAvatar(string url)
     {
-        
-        try
-        {
-            using (HttpClient client = new HttpClient())
-            using (HttpResponseMessage response = await client.GetAsync(url))
-            using (HttpContent content = response.Content)
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    using (var stream = await content.ReadAsStreamAsync())
-                    {
-                        return new Bitmap(stream);
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al descargar la imagen: {ex.Message}");
-        }
-
-        return null;
-    }
-
-    private async Task<Bitmap> DownloadAvatar(SocketGuildUser  user)
-    {
-        string url = "https://cdn.discordapp.com/avatars/" +
-                     user.Id +
-                     "/" +
-                     user.AvatarId +
-                     ".png?size=128 ";
         
         try
         {
