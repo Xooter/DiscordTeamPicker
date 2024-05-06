@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:DiscordTeamPicker.Models"
         xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
         x:Class="DiscordTeamPicker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
+        x:Name="Window"
         Title="DiscordTeamPicker">
 
     <Design.DataContext>
@@ -30,6 +31,7 @@
                 <TextBlock
                     TextWrapping="Wrap"
                     HorizontalAlignment="Center"
+                    TextAlignment="Center"
                     Text="{Binding User.Username}" />
             </StackPanel>
         </DataTemplate>
@@ -66,11 +68,20 @@
                                 <TextBlock
                                     Text="{Binding Name}"
                                     HorizontalAlignment="Center" />
-                                <Separator Margin="20 5"/>
+                                <Separator Margin="20 5" />
                                 <Grid ColumnDefinitions="3* *"
                                       Margin="10"
                                       HorizontalAlignment="Stretch">
-                                    <controls:FAComboBox HorizontalAlignment="Stretch" />
+                                    <controls:FAComboBox
+                                        IsTextSearchEnabled="True"
+                                        ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).GuildChannels,ElementName=Window}"
+                                        HorizontalAlignment="Stretch">
+                                        <controls:FAComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"></TextBlock>
+                                            </DataTemplate>
+                                        </controls:FAComboBox.ItemTemplate>
+                                    </controls:FAComboBox>
                                     <Button Grid.Column="1"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Stretch"
@@ -89,7 +100,7 @@
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
-                                
+
                                 <Grid ColumnDefinitions="* * *"
                                       Margin="10"
                                       HorizontalAlignment="Stretch">
@@ -98,7 +109,7 @@
                                             VerticalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock>Bloquear</TextBlock>
-                                        <controls:SymbolIcon Symbol="LikeFilled" />
+                                            <controls:SymbolIcon Symbol="LikeFilled" />
                                         </StackPanel>
                                     </Button>
                                     <Button Grid.Column="1"
@@ -107,7 +118,7 @@
                                             Margin="10 0 0 0">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock>Mutear</TextBlock>
-                                        <controls:SymbolIcon Symbol="SpeakerMuteFilled" />
+                                            <controls:SymbolIcon Symbol="SpeakerMuteFilled" />
                                         </StackPanel>
                                     </Button>
                                     <Button Grid.Column="2"
@@ -116,7 +127,7 @@
                                             Margin="10 0 0 0">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock>Mover</TextBlock>
-                                        <controls:SymbolIcon Symbol="Go" />
+                                            <controls:SymbolIcon Symbol="Go" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>

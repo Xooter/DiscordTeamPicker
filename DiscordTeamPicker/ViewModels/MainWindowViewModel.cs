@@ -19,6 +19,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<DiscordUser> Users { get; set; } = [];
     public ObservableCollection<Team> Teams { get; set; } = [];
 
+    public ObservableCollection<SocketGuildChannel> GuildChannels { get; set; } = [];
+
     public MainWindowViewModel()
     {
         InitDiscordApi();
@@ -39,7 +41,28 @@ public partial class MainWindowViewModel : ViewModelBase
     private Task ClientOnReady()
     {
         GetUserInChannel(1006752745392443503);
+        GetGuildChannels(1006752745392443503);
         return Task.CompletedTask;
+    }
+
+    private async void GetGuildChannels(ulong channelId)
+    {
+
+        if (await _client.GetChannelAsync(channelId) is IGuildChannel channel)
+        {
+            var guild = channel.Guild;
+            var channels = await guild.GetChannelsAsync();
+            
+            var orderedChannels = channels
+                                  .OfType<SocketVoiceChannel>()
+                                  .OrderBy(chan => chan.GetType())
+                                  .ThenBy(chan => chan.Position);    
+            
+            foreach (var chan in orderedChannels)
+            {
+                GuildChannels.Add(chan);
+            }
+        }
     }
 
     private async void GetUserInChannel(ulong channelId)
