@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Discord;
 using Discord.WebSocket;
@@ -18,7 +19,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<DiscordUser> Users { get; set; } = [];
     public ObservableCollection<Team> Teams { get; set; } = [];
 
-    public ObservableCollection<SocketGuildChannel> GuildChannels { get; set; } = [];
+    public ObservableCollection<SocketVoiceChannel> GuildVoiceChannels { get; set; } = [];
+    public ObservableCollection<SocketTextChannel> GuildTextChannels { get; set; } = [];
+
+    [ObservableProperty] SocketTextChannel _messageTextChannel;
+
+    private Config? config { get; set; }
+    [ObservableProperty] private string _currentChannelId;
+    [ObservableProperty] private Bitmap _guildAvatar;
 
     public MainWindowViewModel()
     {
@@ -29,8 +37,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _client = new DiscordSocketClient();
 
-        var a = new SecretManager<Config?>("config.json");
-        Config? config = a.LoadConfig();
+        var configManager = new SecretManager<Config?>("config.json");
+        config = configManager.LoadConfig();
+
+        CurrentChannelId = config.CurrentChannelId;
         
         await _client.LoginAsync(TokenType.Bot, config?.Token);
         await _client.StartAsync();
@@ -39,9 +49,25 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private Task ClientOnReady()
     {
-        GetUserInChannel(1006752745392443503);
-        GetGuildChannels(1006752745392443503);
+        RefreshUsersInChannel();
         return Task.CompletedTask;
+    }
+
+    partial void OnCurrentChannelIdChanged(string value)
+    {
+        var configManager = new SecretManager<Config?>("config.json");
+        config.CurrentChannelId = value;
+        configManager.SaveConfig(config);
+    }
+
+    [RelayCommand]
+    void RefreshUsersInChannel()
+    {
+        if (ulong.TryParse(config.CurrentChannelId, out ulong channelId))
+        {
+            GetUserInChannel(channelId);
+            GetGuildChannels(channelId);
+        }
     }
 
     private async void GetGuildChannels(ulong channelId)
@@ -52,15 +78,31 @@ public partial class MainWindowViewModel : ViewModelBase
             var guild = channel.Guild;
             var channels = await guild.GetChannelsAsync();
             
-            var orderedChannels = channels
-                                  .OfType<SocketVoiceChannel>()
-                                  .OrderBy(chan => chan.GetType())
-                                  .ThenBy(chan => chan.Position);    
+            GuildAvatar = await DownloadGuildAvatar(guild.IconUrl);
+
+            var orderedTextChannels = channels
+                                      .OfType<SocketTextChannel>()
+                                      // ultra mega rebuscado
+                                      .Where(x=> (x as SocketVoiceChannel)?.Bitrate == null)
+                                      .OrderBy(chan => chan.Position);    
             
-            foreach (var chan in orderedChannels)
+            var orderedVoiceChannels = channels
+                                       .OfType<SocketVoiceChannel>()
+                                       .OrderBy(chan => chan.Position);    
+            
+            
+            foreach (var chan in orderedVoiceChannels)
             {
-                GuildChannels.Add(chan);
+                GuildVoiceChannels.Add(chan);
             }
+            
+            foreach (var chan in orderedTextChannels)
+            {
+                    GuildTextChannels.Add(chan);
+            }
+
+            if (GuildTextChannels.Count > 0 )
+                MessageTextChannel = GuildTextChannels.First();
         }
     }
 
@@ -70,6 +112,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (await _client.GetChannelAsync(channelId) is IGuildChannel channel)
         {
             var guild = channel.Guild;
+
 
             if (guild != null)
             {
@@ -94,6 +137,31 @@ public partial class MainWindowViewModel : ViewModelBase
                 }
             }
         }
+    }
+    private async Task<Bitmap> DownloadGuildAvatar(string url)
+    {
+        
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            using (HttpResponseMessage response = await client.GetAsync(url))
+            using (HttpContent content = response.Content)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    using (var stream = await content.ReadAsStreamAsync())
+                    {
+                        return new Bitmap(stream);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al descargar la imagen: {ex.Message}");
+        }
+
+        return null;
     }
 
     private async Task<Bitmap> DownloadAvatar(SocketGuildUser  user)
@@ -163,11 +231,11 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     void NewTeam()
     {
-        if (Teams.Count < 10)
+        if (Teams.Count < 5)
         {
-            var availableChannels =GuildChannels 
-                                    .Where(chan => Teams.All(team => team.Channel != chan))  
-                                    .ToList();
+            var availableChannels =GuildVoiceChannels 
+                                   .Where(chan => Teams.All(team => team.Channel != chan))  
+                                   .ToList();
 
             SocketGuildChannel selectedChannel = availableChannels.FirstOrDefault(); 
             

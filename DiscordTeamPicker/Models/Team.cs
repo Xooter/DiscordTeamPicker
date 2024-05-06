@@ -10,4 +10,6 @@ public class Team
     public List<DiscordUser> Users { get; set; }
     
     public SocketGuildChannel Channel { get; set; }
+    
+    public bool Blocked { get; set; }
 }
