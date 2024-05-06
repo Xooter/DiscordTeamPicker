@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Discord;
 using Discord.WebSocket;
+using DiscordTeamPicker.Helpers;
 using DiscordTeamPicker.Models;
 
 namespace DiscordTeamPicker.ViewModels;
@@ -14,8 +15,8 @@ namespace DiscordTeamPicker.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private DiscordSocketClient _client =new(); 
-    public ObservableCollection<DiscordUser> Users { get; set; } = new();
-    private List<List<IUser>> Teams = [];
+    public ObservableCollection<DiscordUser> Users { get; set; } = [];
+    public ObservableCollection<List<DiscordUser>> Teams { get; set; } = [];
 
     public MainWindowViewModel()
     {
@@ -25,8 +26,11 @@ public class MainWindowViewModel : ViewModelBase
     private async void InitDiscordApi()
     {
         _client = new DiscordSocketClient();
+
+        var a = new SecretManager<Config?>("config.json");
+        Config? config = a.LoadConfig();
         
-        await _client.LoginAsync(TokenType.Bot, );
+        await _client.LoginAsync(TokenType.Bot, config?.Token);
         await _client.StartAsync();
         _client.Ready += ClientOnReady;
     }

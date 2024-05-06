@@ -10,30 +10,34 @@
         Title="DiscordTeamPicker">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
+    <Window.Resources>
+    </Window.Resources>
+    
     <StackPanel>
-        
-<!-- <controls:FAComboBox/> -->
-<!-- <controls:FAComboBox/> -->
-<ItemsControl ItemsSource="{Binding Users}">
-    <ItemsControl.ItemTemplate>
-        <DataTemplate>
-            <StackPanel>
-                <Border ClipToBounds="True"  
-                        Height="128"
-                        Width="128">
-                    <Image 
-                        Width="128"
-                        Height="128"
-                        Stretch="UniformToFill"
-                        Source="{Binding Avatar}"/>
-                </Border>
-                <TextBlock Text="{Binding User.Username}"/>
-            </StackPanel>
-        </DataTemplate>
-    </ItemsControl.ItemTemplate>
-</ItemsControl>
+        <ItemsControl ItemsSource="{Binding Users}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Width="70" Height="70">
+                        <Border ClipToBounds="True"
+                                CornerRadius="32"
+                                Height="64"
+                                Width="64">
+                            <Image
+                                Width="64"
+                                Height="64"
+                                Stretch="UniformToFill"
+                                Source="{Binding Avatar}" />
+                        </Border>
+                        <TextBlock 
+                            TextWrapping="Wrap"
+                            HorizontalAlignment="Center"
+                            Text="{Binding User.Username}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
     </StackPanel>
 </Window>
