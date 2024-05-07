@@ -98,7 +98,7 @@ public partial class MainWindowViewModel : ViewModelBase
             
             foreach (var chan in orderedTextChannels)
             {
-                    GuildTextChannels.Add(chan);
+                GuildTextChannels.Add(chan);
             }
 
             if (GuildTextChannels.Count > 0 )
@@ -111,30 +111,27 @@ public partial class MainWindowViewModel : ViewModelBase
         Users.Clear();
         if (await _client.GetChannelAsync(channelId) is IGuildChannel channel)
         {
-            var guild = channel.Guild;
-
-
-            if (guild != null)
+            try
             {
-                var usersInChannel = channel.GetUsersAsync().FlattenAsync();
-                var filteredUsers = usersInChannel.Result
-                                                  .Where(x => !x.IsBot &&
-                                                              x.VoiceChannel.Id == channelId);
+                Users.Clear();
+                    
+                var usersInChannel = await channel.GetUsersAsync().FlattenAsync();
+                var filteredUsers = usersInChannel.Where(x =>  x is { IsBot: false } &&
+                                                               x.VoiceChannel?.Id == channelId);
                 
                 foreach (var user in filteredUsers)
                 {
-                    var activeUser = channel.GetUserAsync(user.Id);
-                    if (activeUser.Result is { IsBot: false })
+                    var activeUser = await channel.GetUserAsync(user.Id);
+                    if (activeUser is { IsBot: false })
                     {
-        string url = "https://cdn.discordapp.com/avatars/" +
-                     user.Id +
-                     "/" +
-                     user.AvatarId +
-                     ".png?size=128 ";
+                        string url = "https://cdn.discordapp.com/avatars/" +
+                                     user.Id +
+                                     "/" +
+                                     user.AvatarId +
+                                     ".png?size=128 ";
                         DiscordUser newUser = new DiscordUser()
                         {
-                            User = activeUser.Result  as SocketGuildUser,
-                            
+                            User = activeUser  as SocketGuildUser,
         
                             Avatar = await DownloadAvatar(url)
                         };
@@ -142,6 +139,10 @@ public partial class MainWindowViewModel : ViewModelBase
                         Users.Add(newUser);
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }
@@ -171,27 +172,45 @@ public partial class MainWindowViewModel : ViewModelBase
         return null;
     }
     
-    // async void ShuffleUsers()
-    // {
-    // var checkedItems = UsersList.CheckedItems;
-    //
-    // List<IUser?> CheckedUsers = users.Where(x => checkedItems.Contains(x.Username)).ToList();
-    //
-    // ClearLists();
-    //
-    // Random rnd = new Random();
-    // ListTeam1 = CheckedUsers.OrderBy(x => rnd.Next()).Take(CheckedUsers.Count / 2).ToList();
-    // ListTeam2 = CheckedUsers.Except(ListTeam1).ToList();
-    // foreach (var item in ListTeam1)
-    // {
-    //     Team1.Items.Add(item.Username);
-    // }
-    //
-    // foreach (var item in ListTeam2)
-    // {
-    //     Team2.Items.Add(item.Username);
-    // }
-    // }
+    [RelayCommand]
+    private void Shuffle()
+    {
+        
+        foreach (var team in Teams)
+        {
+            if (!team.Blocked)
+            {
+                team.Users.Clear();
+            }
+        }
+        
+        var usersShuffled = ShuffleList(Users);
+        int teamIndex = 0;
+        var eligibleTeams = Teams.Where(team => !team.Blocked).ToList();
+        
+        foreach (var user in usersShuffled)
+        {
+            var currentTeam = eligibleTeams[teamIndex];
+
+            currentTeam.Users.Add(user);
+
+            teamIndex = (teamIndex + 1) % eligibleTeams.Count;
+        }    
+    }    
+    
+    private ObservableCollection<T> ShuffleList<T>(ObservableCollection<T> list)
+    {
+        Random rng = new Random();
+        ObservableCollection<T> newList = list;
+        int n = newList.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (newList[k], newList[n]) = (newList[n], newList[k]);
+        }
+        return newList;
+    }
     
     // async void MoveParticipants(List<IUser?> team, ulong channelToMove)
     // {
@@ -217,7 +236,6 @@ public partial class MainWindowViewModel : ViewModelBase
             
             Teams.Add(new Team()
             {
-                Users = Users.ToList(),
                 Channel = selectedChannel
             });
         }

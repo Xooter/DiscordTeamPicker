@@ -37,7 +37,7 @@
                         TextWrapping="Wrap"
                         HorizontalAlignment="Center"
                         TextAlignment="Center"
-                        Text="{Binding User.Username}" />
+                        Text="{Binding User.GlobalName}" />
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -115,7 +115,7 @@
             <Button Grid.Column="1"
                     Grid.Row="0"
                     HorizontalAlignment="Stretch"
-                    Command="{Binding NewTeamCommand}">
+                    Command="{Binding ShuffleCommand}">
                 Shuffle
             </Button>
             <Button Grid.Column="0"
