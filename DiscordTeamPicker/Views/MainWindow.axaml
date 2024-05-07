@@ -118,7 +118,7 @@
                     Grid.Row="1"
                     HorizontalAlignment="Stretch"
                     Margin="0 10 10 10"
-                    Command="{Binding NewTeamCommand}">
+                    Command="{Binding MuteAllCommand}">
                 Mute All
             </Button>
             <Button Grid.Column="1"
@@ -220,9 +220,11 @@
                                     <Button Grid.Column="1"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Stretch"
+                                            Command="{ Binding ((vm:MainWindowViewModel)DataContext).MuteTeamCommand,ElementName=Window}"
+                                            CommandParameter="{Binding .}"
                                             Margin="10 0 0 0">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
-                                            <TextBlock>Mutear</TextBlock>
+                                            <TextBlock>Mute</TextBlock>
                                             <controls:SymbolIcon Symbol="SpeakerMuteFilled" />
                                         </StackPanel>
                                     </Button>

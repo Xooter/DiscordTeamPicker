@@ -213,7 +213,25 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     
     [RelayCommand]
-    async void MoveTeam(Team team)
+    async Task MuteTeam(Team team)
+    {
+        foreach (var user in team.Users)
+        {
+            await user.User?.ModifyAsync(x => x.Mute = true)!;
+        }
+    }
+
+    [RelayCommand]
+    void MuteAll()
+    {
+        foreach (var team in Teams)
+        {
+           MuteTeam(team);
+        }
+    }
+    
+    [RelayCommand]
+    async Task MoveTeam(Team team)
     {
         foreach (var user in team.Users)
         {
