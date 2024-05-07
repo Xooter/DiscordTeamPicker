@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -23,14 +25,18 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<SocketVoiceChannel> GuildVoiceChannels { get; set; } = [];
     public ObservableCollection<SocketTextChannel> GuildTextChannels { get; set; } = [];
 
-    [ObservableProperty] SocketTextChannel _messageTextChannel;
+    [ObservableProperty] SocketTextChannel? _messageTextChannel;
 
     private Config? config { get; set; }
-    [ObservableProperty] private string _currentChannelId;
+    [ObservableProperty] private string? _currentChannelId;
     [ObservableProperty] private Bitmap _guildAvatar;
 
     public MainWindowViewModel()
     {
+        var configManager = new SecretManager<Config?>("config.json");
+        config = configManager.LoadConfig();
+        if(config.Token == null) return;
+        
         InitDiscordApi();
     }
 
@@ -38,37 +44,38 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _client = new DiscordSocketClient();
 
-        var configManager = new SecretManager<Config?>("config.json");
-        config = configManager.LoadConfig();
-
-        CurrentChannelId = config.CurrentChannelId;
+        CurrentChannelId = config.CurrentChannelId.ToString();
         
         await _client.LoginAsync(TokenType.Bot, config?.Token);
         await _client.StartAsync();
         _client.Ready += ClientOnReady;
     }
 
-    private Task ClientOnReady()
+    private async Task ClientOnReady()
     {
         RefreshUsersInChannel();
-        return Task.CompletedTask;
     }
 
     partial void OnCurrentChannelIdChanged(string value)
     {
         var configManager = new SecretManager<Config?>("config.json");
-        config.CurrentChannelId = value;
+        if(ulong.TryParse(value,out ulong id))
+            config.CurrentChannelId = id;
+        configManager.SaveConfig(config);
+    }
+
+    partial void OnMessageTextChannelChanged(SocketTextChannel value)
+    {
+        var configManager = new SecretManager<Config?>("config.json");
+        config.TextChannelId = value.Id;
         configManager.SaveConfig(config);
     }
 
     [RelayCommand]
     void RefreshUsersInChannel()
     {
-        if (ulong.TryParse(config.CurrentChannelId, out ulong channelId))
-        {
-            GetUserInChannel(channelId);
-            GetGuildChannels(channelId);
-        }
+        GetUserInChannel(config.CurrentChannelId);
+        GetGuildChannels(config.CurrentChannelId);
     }
 
     private async void GetGuildChannels(ulong channelId)
@@ -102,7 +109,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 GuildTextChannels.Add(chan);
             }
 
-            if (GuildTextChannels.Count > 0 )
+            if(await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
+                MessageTextChannel = channelText;
+            if (GuildTextChannels.Count > 0 && MessageTextChannel == null)
                 MessageTextChannel = GuildTextChannels.First();
         }
     }
@@ -292,5 +301,27 @@ public partial class MainWindowViewModel : ViewModelBase
     void RemoveTeam(Team team)
     {
         Teams.Remove(team);
+    }
+
+    [RelayCommand]
+    async Task SendMessage()
+    {
+        foreach (var team in Teams)
+        {
+            if(team.Users.Count == 0) continue;
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.AppendLine($"## **{team.Name}**");
+
+            for (int i = 0; i < team.Users.Count; i++)
+            {
+                var user = team.Users[i].User;
+                
+                messageBuilder.AppendLine($"{i+1}. {user.Mention} ({user.GlobalName})");
+            }
+            
+            Debug.WriteLine(messageBuilder.ToString());
+            await MessageTextChannel.SendMessageAsync(messageBuilder.ToString());
+        } 
+        
     }
 }

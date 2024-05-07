@@ -18,13 +18,18 @@ public class SecretManager<T>
     
     public T? LoadConfig()
     {
+        T config;
         if (!File.Exists(configPath))
         {
-            return default(T);
+            config = Activator.CreateInstance<T>();
+            SaveConfig(config); 
         }
-
-        var jsonString = File.ReadAllText(configPath);
-        return JsonSerializer.Deserialize<T>(jsonString);
+        else
+        {
+            var jsonString = File.ReadAllText(configPath);
+            return JsonSerializer.Deserialize<T>(jsonString);
+        }
+        return config;
     }
 
     public void SaveConfig(T config)
