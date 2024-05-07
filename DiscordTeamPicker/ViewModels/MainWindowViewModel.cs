@@ -253,8 +253,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (Teams.Count < 5)
         {
-            var availableChannels =GuildVoiceChannels 
-                                   .Where(chan => Teams.All(team => team.Channel != chan))  
+            var availableChannels = GuildVoiceChannels 
+                                   .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id.ToString() != CurrentChannelId)  
                                    .ToList();
 
             SocketGuildChannel selectedChannel = availableChannels.FirstOrDefault(); 
