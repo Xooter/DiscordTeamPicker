@@ -34,10 +34,12 @@ public partial class MainWindowViewModel : ViewModelBase
     
     [ObservableProperty] private bool _tokenDialogIsOpen;
     [ObservableProperty] private string _tokenValueInput;
+
+    private SecretManager configManager;
     
     public MainWindowViewModel()
     {
-        var configManager = new SecretManager<Config?>("config.json");
+        configManager = new SecretManager("config.json");
         config = configManager.LoadConfig();
         
         
@@ -69,14 +71,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnTokenValueInputChanged(string value)
     {
-        var configManager = new SecretManager<Config?>("config.json");
         config.Token = value;
         configManager.SaveConfig(config);
     }
     
     partial void OnCurrentChannelIdChanged(string value)
     {
-        var configManager = new SecretManager<Config?>("config.json");
         if(ulong.TryParse(value,out ulong id))
             config.CurrentChannelId = id;
         configManager.SaveConfig(config);
@@ -84,7 +84,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnMessageTextChannelChanged(SocketTextChannel value)
     {
-        var configManager = new SecretManager<Config?>("config.json");
         config.TextChannelId = value.Id;
         configManager.SaveConfig(config);
     }

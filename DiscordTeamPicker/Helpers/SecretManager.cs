@@ -1,10 +1,11 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using DiscordTeamPicker.Models;
 
 namespace DiscordTeamPicker.Helpers;
 
-public class SecretManager<T>
+public class SecretManager
 {
     private readonly string configPath;
 
@@ -16,23 +17,22 @@ public class SecretManager<T>
     }
 
     
-    public T? LoadConfig()
+    public Config? LoadConfig()
     {
-        T config;
+        Config config = new Config();
         if (!File.Exists(configPath))
         {
-            config = Activator.CreateInstance<T>();
             SaveConfig(config); 
         }
         else
         {
             var jsonString = File.ReadAllText(configPath);
-            return JsonSerializer.Deserialize<T>(jsonString);
+            return JsonSerializer.Deserialize<Config>(jsonString);
         }
         return config;
     }
 
-    public void SaveConfig(T config)
+    public void SaveConfig(Config config)
     {
         var jsonString = JsonSerializer.Serialize(config);
         File.WriteAllText(configPath, jsonString);
