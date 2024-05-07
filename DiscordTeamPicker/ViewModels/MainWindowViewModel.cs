@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -191,7 +192,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             var currentTeam = eligibleTeams[teamIndex];
 
-            currentTeam.Users.Add(user);
+            if(!Teams.Where(x=> x.Blocked).Any(x=> x.Users.Contains(user)))
+                currentTeam.Users.Add(user);
 
             teamIndex = (teamIndex + 1) % eligibleTeams.Count;
         }
@@ -213,6 +215,12 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     
     [RelayCommand]
+    void BlockTeam(Team team)
+    {
+        team.Blocked = !team.Blocked;
+    }
+    
+    [RelayCommand]
     async Task MuteTeam(Team team)
     {
         foreach (var user in team.Users)
@@ -226,7 +234,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         foreach (var team in Teams)
         {
-           MuteTeam(team);
+            MuteTeam(team);
         }
     }
     
@@ -251,11 +259,11 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     void NewTeam()
     {
-        if (Teams.Count < 5)
+        if (Teams.Count < 10)
         {
             var availableChannels = GuildVoiceChannels 
-                                   .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id.ToString() != CurrentChannelId)  
-                                   .ToList();
+                                    .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id.ToString() != CurrentChannelId)  
+                                    .ToList();
 
             SocketGuildChannel selectedChannel = availableChannels.FirstOrDefault(); 
             

@@ -17,25 +17,25 @@
     </Design.DataContext>
     <Window.Resources>
         <DataTemplate x:Key="User" x:DataType="models:DiscordUser">
-                <StackPanel Width="70"
-                            Spacing="15"
-                            Margin="15 10">
-                    <Border ClipToBounds="True"
-                            CornerRadius="40"
-                            Height="80"
-                            Width="80">
-                        <Image
-                            Width="80"
-                            Height="80"
-                            Stretch="UniformToFill"
-                            Source="{Binding Avatar}" />
-                    </Border>
-                    <TextBlock
-                        TextWrapping="WrapWithOverflow"
-                        HorizontalAlignment="Center"
-                        TextAlignment="Left"
-                        Text="{Binding User.GlobalName}" />
-                </StackPanel>
+            <StackPanel Width="70"
+                        Spacing="15"
+                        Margin="15 10">
+                <Border ClipToBounds="True"
+                        CornerRadius="40"
+                        Height="80"
+                        Width="80">
+                    <Image
+                        Width="80"
+                        Height="80"
+                        Stretch="UniformToFill"
+                        Source="{Binding Avatar}" />
+                </Border>
+                <TextBlock
+                    TextWrapping="WrapWithOverflow"
+                    HorizontalAlignment="Center"
+                    TextAlignment="Left"
+                    Text="{Binding User.GlobalName}" />
+            </StackPanel>
         </DataTemplate>
     </Window.Resources>
 
@@ -211,10 +211,25 @@
                                       HorizontalAlignment="Stretch">
                                     <Button Grid.Column="0"
                                             HorizontalAlignment="Stretch"
+                                            Classes.accent="{Binding Blocked}"
+                                            Command="{ Binding ((vm:MainWindowViewModel)DataContext).BlockTeamCommand,ElementName=Window}"
+                                            CommandParameter="{Binding .}"
                                             VerticalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
-                                            <TextBlock>Bloquear</TextBlock>
-                                            <controls:SymbolIcon Symbol="LikeFilled" />
+                                            <TextBlock
+                                                Classes.Blocked="{Binding Blocked}"
+                                                Classes.NotBlocked="{Binding !Blocked}">
+                                                <TextBlock.Styles>
+                                                    <Style Selector="TextBlock.Blocked">
+                                                        <Setter Property="Text" Value="Unblock" />
+                                                    </Style>
+                                                    <Style Selector="TextBlock.NotBlocked">
+                                                        <Setter Property="Text" Value="Block" />
+                                                    </Style>
+                                                </TextBlock.Styles>
+                                            </TextBlock>
+                                            <controls:SymbolIcon Symbol="ReportHacked"
+                                                                 IsVisible="{Binding Blocked}" />
                                         </StackPanel>
                                     </Button>
                                     <Button Grid.Column="1"
@@ -235,7 +250,7 @@
                                             CommandParameter="{Binding .}"
                                             Margin="10 0 0 0">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
-                                            <TextBlock>Mover</TextBlock>
+                                            <TextBlock>Move</TextBlock>
                                             <controls:SymbolIcon Symbol="Go" />
                                         </StackPanel>
                                     </Button>
