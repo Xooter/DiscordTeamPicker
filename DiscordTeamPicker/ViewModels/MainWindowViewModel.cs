@@ -175,7 +175,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void Shuffle()
     {
-        
         foreach (var team in Teams)
         {
             if (!team.Blocked)
@@ -195,13 +194,14 @@ public partial class MainWindowViewModel : ViewModelBase
             currentTeam.Users.Add(user);
 
             teamIndex = (teamIndex + 1) % eligibleTeams.Count;
-        }    
+        }
     }    
     
     private ObservableCollection<T> ShuffleList<T>(ObservableCollection<T> list)
     {
         Random rng = new Random();
-        ObservableCollection<T> newList = list;
+        ObservableCollection<T> newList = new ObservableCollection<T>(list);
+        
         int n = newList.Count;
         while (n > 1)
         {
@@ -212,16 +212,24 @@ public partial class MainWindowViewModel : ViewModelBase
         return newList;
     }
     
-    // async void MoveParticipants(List<IUser?> team, ulong channelToMove)
-    // {
-    //     var channel = await _client.GetChannelAsync(channelToMove);
-    //     foreach (var item in team)
-    //     {
-    //         IGuildUser? guildUser = item as IGuildUser;
-    //         Thread.Sleep(50);
-    //         await guildUser.ModifyAsync(x => x.ChannelId = channel.Id);
-    //     }
-    // }
+    [RelayCommand]
+    async void MoveTeam(Team team)
+    {
+        var channel = await _client.GetChannelAsync(team.Channel.Id);
+        foreach (var user in team.Users)
+        {
+            await user.User?.ModifyAsync(x => x.ChannelId = channel.Id)!;
+        }
+    }
+
+    [RelayCommand]
+    void MoveAll()
+    {
+        foreach (var team in Teams)
+        {
+            MoveTeam(team);
+        }
+    }
     
     [RelayCommand]
     void NewTeam()

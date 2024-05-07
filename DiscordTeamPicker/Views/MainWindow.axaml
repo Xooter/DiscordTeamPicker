@@ -17,29 +17,25 @@
     </Design.DataContext>
     <Window.Resources>
         <DataTemplate x:Key="User" x:DataType="models:DiscordUser">
-            <Border Background="#1e1e1e"
-                    Height="110"
-                    CornerRadius="10"
-                    Margin="10 5">
                 <StackPanel Width="70"
-                            Margin="5">
+                            Spacing="15"
+                            Margin="15 10">
                     <Border ClipToBounds="True"
-                            CornerRadius="32"
-                            Height="64"
-                            Width="64">
+                            CornerRadius="40"
+                            Height="80"
+                            Width="80">
                         <Image
-                            Width="64"
-                            Height="64"
+                            Width="80"
+                            Height="80"
                             Stretch="UniformToFill"
                             Source="{Binding Avatar}" />
                     </Border>
                     <TextBlock
-                        TextWrapping="Wrap"
+                        TextWrapping="WrapWithOverflow"
                         HorizontalAlignment="Center"
-                        TextAlignment="Center"
+                        TextAlignment="Left"
                         Text="{Binding User.GlobalName}" />
                 </StackPanel>
-            </Border>
         </DataTemplate>
     </Window.Resources>
 
@@ -47,11 +43,11 @@
         RowDefinitions="Auto Auto *"
         Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="*" MaxWidth="350"/>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" MaxWidth="350" />
         </Grid.ColumnDefinitions>
         <DockPanel
-            Margin="0 10"
+            Margin="0 0 0 10"
             Grid.ColumnSpan="2">
             <Button
                 DockPanel.Dock="Right"
@@ -61,7 +57,7 @@
             <StackPanel Orientation="Horizontal"
                         Spacing="20">
                 <Border ClipToBounds="True"
-                        CornerRadius="40"
+                        CornerRadius="20"
                         Height="80"
                         Width="80">
                     <Image
@@ -71,10 +67,10 @@
                         Stretch="UniformToFill" />
                 </Border>
                 <TextBox Watermark="Channel ID"
+                         VerticalAlignment="Center"
                          MinWidth="200"
                          MaxLength="19"
-                         Text="{Binding CurrentChannelId}"
-                         VerticalAlignment="Center" />
+                         Text="{Binding CurrentChannelId}" />
                 <Button
                     HorizontalAlignment="Stretch"
                     Command="{Binding RefreshUsersInChannelCommand}">
@@ -129,7 +125,7 @@
                     Grid.Row="1"
                     HorizontalAlignment="Stretch"
                     Margin="0 10"
-                    Command="{Binding NewTeamCommand}">
+                    Command="{Binding MoveAllCommand}">
                 Move all
             </Button>
             <controls:FAComboBox
@@ -168,7 +164,7 @@
                         <Border Background="#1e1e1e"
                                 Margin="5"
                                 CornerRadius="10">
-                            <StackPanel Width="400"
+                            <StackPanel Width="300"
                                         Margin="10">
                                 <TextBlock
                                     Text="{Binding Name}"
@@ -233,6 +229,8 @@
                                     <Button Grid.Column="2"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Stretch"
+                                            Command="{ Binding ((vm:MainWindowViewModel)DataContext).MoveTeamCommand,ElementName=Window}"
+                                            CommandParameter="{Binding .}"
                                             Margin="10 0 0 0">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock>Mover</TextBlock>
