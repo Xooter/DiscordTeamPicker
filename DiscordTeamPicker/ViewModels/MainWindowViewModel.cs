@@ -215,10 +215,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     async void MoveTeam(Team team)
     {
-        var channel = await _client.GetChannelAsync(team.Channel.Id);
         foreach (var user in team.Users)
         {
-            await user.User?.ModifyAsync(x => x.ChannelId = channel.Id)!;
+            await user.User?.ModifyAsync(x => x.ChannelId = team.Channel.Id)!;
         }
     }
 
