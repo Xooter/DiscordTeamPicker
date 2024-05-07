@@ -5,6 +5,7 @@
       <map>
         <entry key="DiscordTeamPicker/App.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/MainWindow.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/TokenDialog.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
       </map>
     </option>
   </component>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -31,17 +30,28 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string? _currentChannelId;
     [ObservableProperty] private Bitmap _guildAvatar;
 
+    [ObservableProperty] private bool _isDiscordAvaible;
+    
+    [ObservableProperty] private bool _tokenDialogIsOpen;
+    [ObservableProperty] private string _tokenValueInput;
+    
     public MainWindowViewModel()
     {
         var configManager = new SecretManager<Config?>("config.json");
         config = configManager.LoadConfig();
-        if(config.Token == null) return;
+        
         
         InitDiscordApi();
     }
 
     private async void InitDiscordApi()
     {
+        IsDiscordAvaible = config.Token != null;
+        
+        if(config.Token == null) return;
+
+        TokenValueInput = config.Token;
+        
         _client = new DiscordSocketClient();
 
         CurrentChannelId = config.CurrentChannelId.ToString();
@@ -51,11 +61,19 @@ public partial class MainWindowViewModel : ViewModelBase
         _client.Ready += ClientOnReady;
     }
 
-    private async Task ClientOnReady()
+    private Task ClientOnReady()
     {
         RefreshUsersInChannel();
+        return Task.CompletedTask;
     }
 
+    partial void OnTokenValueInputChanged(string value)
+    {
+        var configManager = new SecretManager<Config?>("config.json");
+        config.Token = value;
+        configManager.SaveConfig(config);
+    }
+    
     partial void OnCurrentChannelIdChanged(string value)
     {
         var configManager = new SecretManager<Config?>("config.json");
@@ -74,6 +92,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     void RefreshUsersInChannel()
     {
+        if(config.CurrentChannelId == 0) return;
         GetUserInChannel(config.CurrentChannelId);
         GetGuildChannels(config.CurrentChannelId);
     }
@@ -109,7 +128,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 GuildTextChannels.Add(chan);
             }
 
-            if(await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
+            if(config != null && config.TextChannelId != 0 && await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
                 MessageTextChannel = channelText;
             if (GuildTextChannels.Count > 0 && MessageTextChannel == null)
                 MessageTextChannel = GuildTextChannels.First();
@@ -149,11 +168,14 @@ public partial class MainWindowViewModel : ViewModelBase
                         Users.Add(newUser);
                     }
                 }
+                
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            
+            IsDiscordAvaible = Users.Count != 0;
         }
     }
     private async Task<Bitmap> DownloadAvatar(string url)
@@ -323,5 +345,17 @@ public partial class MainWindowViewModel : ViewModelBase
             await MessageTextChannel.SendMessageAsync(messageBuilder.ToString());
         } 
         
+    }
+    
+    [RelayCommand]
+    void OpenTokenDialog()
+    {
+        TokenDialogIsOpen = true;
+    }
+
+    partial void OnTokenDialogIsOpenChanged(bool value)
+    {
+        if(!value)
+            InitDiscordApi();
     }
 }
