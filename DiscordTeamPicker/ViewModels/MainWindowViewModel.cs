@@ -215,6 +215,20 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     
     [RelayCommand]
+    async Task ReturnAll()
+    {
+        foreach (var team in Teams)
+        {
+            foreach (var user in team.Users)
+            {
+                await Task.Delay(30);
+                if(ulong.TryParse(CurrentChannelId,out ulong channelId))
+                    await user.User?.ModifyAsync(x => x.ChannelId = channelId)!;
+            }
+        }
+    }
+    
+    [RelayCommand]
     void BlockTeam(Team team)
     {
         team.Blocked = !team.Blocked;
