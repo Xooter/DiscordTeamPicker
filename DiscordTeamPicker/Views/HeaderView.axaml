@@ -44,12 +44,6 @@
                 </DataTemplate>
             </controls:FAComboBox.ItemTemplate>
         </controls:FAComboBox>
-        <!-- <TextBox Watermark="Channel ID" -->
-        <!--          VerticalAlignment="Center" -->
-        <!--          MinWidth="200" -->
-        <!--          MaxLength="19" -->
-        <!--          IsEnabled="{Binding !BadToken}" -->
-        <!--          Text="{Binding CurrentChannelId}" /> -->
         <Button
             HorizontalAlignment="Stretch"
             IsEnabled="{Binding !BadToken}"

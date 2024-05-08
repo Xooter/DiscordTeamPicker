@@ -85,12 +85,11 @@ public partial class MainWindowViewModel : ViewModelBase
         await _client.StartAsync();
     }
 
-    private Task ClientOnReady()
+    private async Task ClientOnReady()
     {
         IsDiscordAvaible = true;
         GetBotVoiceChannels();
-        RefreshUsersInChannel();
-        return Task.CompletedTask;
+        await RefreshUsersInChannel();
     }
 
     private  void GetBotVoiceChannels()
@@ -111,8 +110,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 BotVoiceChanels.Add(chan);
             }
 
-            CurrentChannel = BotVoiceChanels.FirstOrDefault();
         }
+        if(Config.CurrentChannelId == 0)
+            CurrentChannel = BotVoiceChanels.FirstOrDefault();
     }
 
     partial void OnTokenValueInputChanged(string value)
