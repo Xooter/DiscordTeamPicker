@@ -28,7 +28,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] SocketTextChannel? _messageTextChannel;
 
     private Config? Config { get; set; }
-    [ObservableProperty] private string? _currentChannelId;
+    [ObservableProperty] SocketGuildChannel? _currentChannel;
     [ObservableProperty] private Bitmap _guildAvatar;
 
     [ObservableProperty] private bool _isDiscordAvaible;
@@ -38,6 +38,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private bool _errorDialogOpen;
     [ObservableProperty] private string _errorText = "";
+    
+    public ObservableCollection<SocketVoiceChannel> BotVoiceChanels { get; set; } = [];
 
     [ObservableProperty]
     private bool _badToken;
@@ -48,11 +50,8 @@ public partial class MainWindowViewModel : ViewModelBase
         var configManager = new SecretManager("config.json");
         Config = configManager.LoadConfig();
         
-        if(Config != null){
-            TokenValueInput = Config.Token;
-            CurrentChannelId = Config.CurrentChannelId.ToString();
-        }
-        
+        if(Config == null)return;
+        TokenValueInput = Config.Token;
         
         InitDiscordApi();
     }
@@ -89,8 +88,31 @@ public partial class MainWindowViewModel : ViewModelBase
     private Task ClientOnReady()
     {
         IsDiscordAvaible = true;
+        GetBotVoiceChannels();
         RefreshUsersInChannel();
         return Task.CompletedTask;
+    }
+
+    private  void GetBotVoiceChannels()
+    {
+        foreach (var guild in _client.Guilds)
+        {
+            var channels= guild.VoiceChannels;
+            
+            if(!channels.Any()) return;
+
+            var orderedVoiceChannels = channels
+                                       .OfType<SocketVoiceChannel>()
+                                       .OrderBy(chan => chan.Position);    
+            
+            
+            foreach (var chan in orderedVoiceChannels)
+            {
+                BotVoiceChanels.Add(chan);
+            }
+
+            CurrentChannel = BotVoiceChanels.FirstOrDefault();
+        }
     }
 
     partial void OnTokenValueInputChanged(string value)
@@ -100,11 +122,11 @@ public partial class MainWindowViewModel : ViewModelBase
         configManager.SaveConfig(Config);
     }
     
-    partial void OnCurrentChannelIdChanged(string value)
+    partial void OnCurrentChannelChanged(SocketGuildChannel? value)
     {
+        if (value == null) return;
         var configManager = new SecretManager("config.json");
-        if(ulong.TryParse(value,out ulong id))
-            Config.CurrentChannelId = id;
+        Config.CurrentChannelId = value.Id;
         configManager.SaveConfig(Config);
     }
 
@@ -116,23 +138,26 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    void RefreshUsersInChannel()
+    async Task RefreshUsersInChannel()
     {
         if(Config.CurrentChannelId == 0) return;
-        GetUserInChannel(Config.CurrentChannelId);
-        GetGuildChannels(Config.CurrentChannelId);
+        if (await _client.GetChannelAsync(Config.CurrentChannelId) is SocketVoiceChannel channel)
+        {
+            CurrentChannel = channel;
+            GetUserInChannel();
+            GetGuildChannels();
+        }
+        else
+        {
+            OpenErrorDialog("Error Searching for current Voice Channel");
+        }
     }
 
-    private async void GetGuildChannels(ulong channelId)
+    private async void GetGuildChannels()
     {
-        if (await _client.GetChannelAsync(channelId) is not IGuildChannel channel)
-        {
-            OpenErrorDialog("There is no channel with that ID");
-            return;
-        }
         
-        var guild = channel.Guild;
-        var channels = await guild.GetChannelsAsync();
+        var guild = CurrentChannel.Guild;
+        var channels =  guild.Channels;
             
             
         GuildAvatar = await DownloadAvatar(guild.IconUrl);
@@ -166,17 +191,11 @@ public partial class MainWindowViewModel : ViewModelBase
             MessageTextChannel = GuildTextChannels.First();
     }
 
-    private async void GetUserInChannel(ulong channelId)
+    private async void GetUserInChannel()
     {
-        if (await _client.GetChannelAsync(channelId) is not IGuildChannel channel)
-        {
-            OpenErrorDialog("There is no channel with that ID");
-            return;
-        } 
-        
         if(Users.Any()) Users.Clear();
 
-        if (await channel.GetUsersAsync().FlattenAsync() is not IEnumerable<IGuildUser?> usersInChannel) 
+        if (CurrentChannel.Users is not IEnumerable<IGuildUser?> usersInChannel) 
         {
             OpenErrorDialog("There is users in the voice channel");
             return;
@@ -185,11 +204,11 @@ public partial class MainWindowViewModel : ViewModelBase
         if(!usersInChannel.Any()) return;
                 
         var filteredUsers = usersInChannel.Where(x =>  x is { IsBot: false } &&
-                                                       x.VoiceChannel?.Id == channelId);
+                                                       x.VoiceChannel?.Id == CurrentChannel.Id);
                 
         foreach (var user in filteredUsers)
         {
-            var activeUser = await channel.GetUserAsync(user.Id);
+            var activeUser = CurrentChannel.GetUser(user.Id);
             if (activeUser is { IsBot: false })
             {
                 string url = "https://cdn.discordapp.com/avatars/" +
@@ -284,8 +303,7 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var user in team.Users)
             {
                 await Task.Delay(30);
-                if(ulong.TryParse(CurrentChannelId,out ulong channelId))
-                    await user.User?.ModifyAsync(x => x.ChannelId = channelId)!;
+                await user.User?.ModifyAsync(x => x.ChannelId = CurrentChannel.Id)!;
             }
         }
     }
@@ -338,7 +356,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (Teams.Count < 10)
         {
             var availableChannels = GuildVoiceChannels 
-                                    .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id.ToString() != CurrentChannelId)  
+                                    .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id != CurrentChannel.Id)  
                                     .ToList();
 
             SocketVoiceChannel? selectedChannel = availableChannels.FirstOrDefault(); 

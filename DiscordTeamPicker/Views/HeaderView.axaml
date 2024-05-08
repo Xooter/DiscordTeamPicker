@@ -26,12 +26,30 @@
                 Source="{Binding GuildAvatar}"
                 Stretch="UniformToFill" />
         </Border>
-        <TextBox Watermark="Channel ID"
-                 VerticalAlignment="Center"
-                 MinWidth="200"
-                 MaxLength="19"
-                 IsEnabled="{Binding !BadToken}"
-                 Text="{Binding CurrentChannelId}" />
+        <controls:FAComboBox
+            IsTextSearchEnabled="True"
+            MinWidth="200"
+            VerticalAlignment="Center"
+            IsEnabled="{Binding !BadToken}"
+            SelectedItem="{Binding CurrentChannel}"
+            ItemsSource="{Binding BotVoiceChanels}"
+            HorizontalAlignment="Stretch">
+            <controls:FAComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <controls:SymbolIcon Symbol="Contact"/>
+                        <TextBlock Text="{Binding ConnectedUsers.Count,StringFormat='{}{0} |'}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </controls:FAComboBox.ItemTemplate>
+        </controls:FAComboBox>
+        <!-- <TextBox Watermark="Channel ID" -->
+        <!--          VerticalAlignment="Center" -->
+        <!--          MinWidth="200" -->
+        <!--          MaxLength="19" -->
+        <!--          IsEnabled="{Binding !BadToken}" -->
+        <!--          Text="{Binding CurrentChannelId}" /> -->
         <Button
             HorizontalAlignment="Stretch"
             IsEnabled="{Binding !BadToken}"
