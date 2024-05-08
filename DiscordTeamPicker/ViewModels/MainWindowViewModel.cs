@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -35,11 +36,13 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _tokenDialogIsOpen;
     [ObservableProperty] private string _tokenValueInput;
 
-    private SecretManager configManager;
+    [ObservableProperty] private bool _errorDialogOpen;
+    [ObservableProperty] private string _errorText = "";
+
     
     public MainWindowViewModel()
     {
-        configManager = new SecretManager("config.json");
+        var configManager = new SecretManager("config.json");
         config = configManager.LoadConfig();
         
         
@@ -72,11 +75,13 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnTokenValueInputChanged(string value)
     {
         config.Token = value;
+        var configManager = new SecretManager("config.json");
         configManager.SaveConfig(config);
     }
     
     partial void OnCurrentChannelIdChanged(string value)
     {
+        var configManager = new SecretManager("config.json");
         if(ulong.TryParse(value,out ulong id))
             config.CurrentChannelId = id;
         configManager.SaveConfig(config);
@@ -84,6 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnMessageTextChannelChanged(SocketTextChannel value)
     {
+        var configManager = new SecretManager("config.json");
         config.TextChannelId = value.Id;
         configManager.SaveConfig(config);
     }
@@ -98,83 +104,87 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async void GetGuildChannels(ulong channelId)
     {
-
-        if (await _client.GetChannelAsync(channelId) is IGuildChannel channel)
+        if (await _client.GetChannelAsync(channelId) is not IGuildChannel channel)
         {
-            var guild = channel.Guild;
-            var channels = await guild.GetChannelsAsync();
-            
-            GuildAvatar = await DownloadAvatar(guild.IconUrl);
-
-            var orderedTextChannels = channels
-                                      .OfType<SocketTextChannel>()
-                                      // ultra mega rebuscado
-                                      .Where(x=> (x as SocketVoiceChannel)?.Bitrate == null)
-                                      .OrderBy(chan => chan.Position);    
-            
-            var orderedVoiceChannels = channels
-                                       .OfType<SocketVoiceChannel>()
-                                       .OrderBy(chan => chan.Position);    
-            
-            
-            foreach (var chan in orderedVoiceChannels)
-            {
-                GuildVoiceChannels.Add(chan);
-            }
-            
-            foreach (var chan in orderedTextChannels)
-            {
-                GuildTextChannels.Add(chan);
-            }
-
-            if(config != null && config.TextChannelId != 0 && await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
-                MessageTextChannel = channelText;
-            if (GuildTextChannels.Count > 0 && MessageTextChannel == null)
-                MessageTextChannel = GuildTextChannels.First();
+            OpenErrorDialog("There is no channel with that ID");
+            return;
         }
+        
+        var guild = channel.Guild;
+        var channels = await guild.GetChannelsAsync();
+            
+            
+        GuildAvatar = await DownloadAvatar(guild.IconUrl);
+            
+        if(!channels.Any()) return;
+
+        var orderedTextChannels = channels
+                                  .OfType<SocketTextChannel>()
+                                  // ultra mega rebuscado
+                                  .Where(x=> (x as SocketVoiceChannel)?.Bitrate == null)
+                                  .OrderBy(chan => chan.Position);    
+            
+        var orderedVoiceChannels = channels
+                                   .OfType<SocketVoiceChannel>()
+                                   .OrderBy(chan => chan.Position);    
+            
+            
+        foreach (var chan in orderedVoiceChannels)
+        {
+            GuildVoiceChannels.Add(chan);
+        }
+            
+        foreach (var chan in orderedTextChannels)
+        {
+            GuildTextChannels.Add(chan);
+        }
+
+        if(config != null && config.TextChannelId != 0 && await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
+            MessageTextChannel = channelText;
+        if (GuildTextChannels.Count > 0 && MessageTextChannel == null)
+            MessageTextChannel = GuildTextChannels.First();
     }
 
     private async void GetUserInChannel(ulong channelId)
     {
-        Users.Clear();
-        if (await _client.GetChannelAsync(channelId) is IGuildChannel channel)
+        if (await _client.GetChannelAsync(channelId) is not IGuildChannel channel)
         {
-            try
-            {
-                Users.Clear();
-                    
-                var usersInChannel = await channel.GetUsersAsync().FlattenAsync();
-                var filteredUsers = usersInChannel.Where(x =>  x is { IsBot: false } &&
-                                                               x.VoiceChannel?.Id == channelId);
-                
-                foreach (var user in filteredUsers)
-                {
-                    var activeUser = await channel.GetUserAsync(user.Id);
-                    if (activeUser is { IsBot: false })
-                    {
-                        string url = "https://cdn.discordapp.com/avatars/" +
-                                     user.Id +
-                                     "/" +
-                                     user.AvatarId +
-                                     ".png?size=128 ";
-                        DiscordUser newUser = new DiscordUser()
-                        {
-                            User = activeUser  as SocketGuildUser,
+            OpenErrorDialog("There is no channel with that ID");
+            return;
+        } 
         
-                            Avatar = await DownloadAvatar(url)
-                        };
-                       
-                        Users.Add(newUser);
-                    }
-                }
+        if(Users.Any()) Users.Clear();
+
+        if (await channel.GetUsersAsync().FlattenAsync() is not IEnumerable<IGuildUser?> usersInChannel) 
+        {
+            OpenErrorDialog("There is users in the voice channel");
+            return;
+        } 
+
+        if(!usersInChannel.Any()) return;
                 
-            }
-            catch (Exception e)
+        var filteredUsers = usersInChannel.Where(x =>  x is { IsBot: false } &&
+                                                       x.VoiceChannel?.Id == channelId);
+                
+        foreach (var user in filteredUsers)
+        {
+            var activeUser = await channel.GetUserAsync(user.Id);
+            if (activeUser is { IsBot: false })
             {
-                Console.WriteLine(e);
+                string url = "https://cdn.discordapp.com/avatars/" +
+                             user.Id +
+                             "/" +
+                             user.AvatarId +
+                             ".png?size=128 ";
+                DiscordUser newUser = new DiscordUser()
+                {
+                    User = activeUser  as SocketGuildUser,
+        
+                    Avatar = await DownloadAvatar(url)
+                };
+                       
+                Users.Add(newUser);
             }
-            
-            IsDiscordAvaible = Users.Count != 0;
         }
     }
     private async Task<Bitmap> DownloadAvatar(string url)
@@ -197,6 +207,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            OpenErrorDialog("Error downloading the avatar");
             Console.WriteLine($"Error al descargar la imagen: {ex.Message}");
         }
 
@@ -354,7 +365,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnTokenDialogIsOpenChanged(bool value)
     {
-        if(!value)
+        if (!value)
+        {
             InitDiscordApi();
+        }
+    }
+
+    private void OpenErrorDialog(string errorMessage)
+    {
+        ErrorText = errorMessage;
+        ErrorDialogOpen = true;
     }
 }
