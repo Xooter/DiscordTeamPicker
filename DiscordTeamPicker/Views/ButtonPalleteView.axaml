@@ -1,0 +1,74 @@
+<Grid xmlns="https://github.com/avaloniaui"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:viewModels="clr-namespace:DiscordTeamPicker.ViewModels"
+      xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+      x:DataType="viewModels:MainWindowViewModel"
+      x:Class="DiscordTeamPicker.Views.ButtonPalleteView">
+    <Button Grid.Column="0"
+            Grid.Row="0"
+            Margin="0 0 10 0"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding NewTeamCommand}">
+        Add Team
+    </Button>
+    <Button Grid.Column="1"
+            Grid.Row="0"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding ShuffleCommand}">
+        Shuffle
+    </Button>
+    <Button Grid.Column="0"
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            Margin="0 10 10 10"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding MuteAllCommand}">
+        Mute All
+    </Button>
+    <Button Grid.Column="1"
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            Margin="0 10"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding MoveAllCommand}">
+        Move all
+    </Button>
+    <controls:FAComboBox
+        IsTextSearchEnabled="True"
+        Grid.Row="2"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        SelectedItem="{Binding MessageTextChannel}"
+        ItemsSource="{Binding GuildTextChannels}"
+        HorizontalAlignment="Stretch">
+        <controls:FAComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+        </controls:FAComboBox.ItemTemplate>
+    </controls:FAComboBox>
+    <Button Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="3"
+            HorizontalAlignment="Stretch"
+            Margin="0 10  0  0"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding SendMessageCommand}">
+        Send To Chat
+    </Button>
+    <Button Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="4"
+            Classes="accent"
+            HorizontalAlignment="Stretch"
+            Margin="0 10"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding ReturnAllCommand}">
+        Return All
+    </Button>
+</Grid>

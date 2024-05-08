@@ -4,44 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:DiscordTeamPicker.Models"
-        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+        xmlns:views="clr-namespace:DiscordTeamPicker.Views"
         mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="800"
         MinWidth="800"
         MinHeight="400"
         x:Class="DiscordTeamPicker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/group.ico"
-        x:Name="Window"
-        Title="DiscordTeamPicker">
+        Title="Discord Team Picker">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
+    
     <Window.Resources>
-        <DataTemplate x:Key="User" x:DataType="models:DiscordUser">
-            <StackPanel Width="70"
-                        Spacing="15"
-                        Margin="15 10">
-                <Border ClipToBounds="True"
-                        CornerRadius="40"
-                        Height="80"
-                        Width="80">
-                    <Image
-                        Width="80"
-                        Height="80"
-                        Stretch="UniformToFill"
-                        Source="{Binding Avatar}" />
-                </Border>
-                <TextBlock
-                    TextWrapping="WrapWithOverflow"
-                    HorizontalAlignment="Center"
-                    TextAlignment="Left"
-                    Text="{Binding User.GlobalName}" />
-            </StackPanel>
-        </DataTemplate>
-
-        <DataTemplate x:Key="UserListItem" x:DataType="models:DiscordUser">
+        <DataTemplate x:DataType="models:DiscordUser" x:Key="UserListItem">
             <StackPanel Width="70"
                         Spacing="15"
                         HorizontalAlignment="Left"
@@ -59,6 +37,27 @@
                 <TextBlock
                     TextWrapping="WrapWithOverflow"
                     VerticalAlignment="Center"
+                    TextAlignment="Left"
+                    Text="{Binding User.GlobalName}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:DataType="models:DiscordUser" x:Key="UserItem">
+            <StackPanel Width="70"
+                        Spacing="15"
+                        Margin="15 10">
+                <Border ClipToBounds="True"
+                        CornerRadius="40"
+                        Height="80"
+                        Width="80">
+                    <Image
+                        Width="80"
+                        Height="80"
+                        Stretch="UniformToFill"
+                        Source="{Binding Avatar}" />
+                </Border>
+                <TextBlock
+                    TextWrapping="WrapWithOverflow"
+                    HorizontalAlignment="Center"
                     TextAlignment="Left"
                     Text="{Binding User.GlobalName}" />
             </StackPanel>
@@ -111,244 +110,26 @@
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="*" MaxWidth="350" />
                 </Grid.ColumnDefinitions>
-                <DockPanel
-                    Margin="0 0 0 10"
-                    Grid.ColumnSpan="2">
-                    <Button
-                        VerticalAlignment="Center"
-                        Command="{Binding OpenTokenDialogCommand}"
-                        DockPanel.Dock="Right"
-                        Classes="accent">
-                        <controls:SymbolIcon Symbol="Permissions" FontSize="18" />
-                    </Button>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="20">
-                        <Border ClipToBounds="True"
-                                CornerRadius="20"
-                                Height="80"
-                                Width="80">
-                            <Image
-                                Width="80"
-                                Height="80"
-                                Source="{Binding GuildAvatar}"
-                                Stretch="UniformToFill" />
-                        </Border>
-                        <TextBox Watermark="Channel ID"
-                                 VerticalAlignment="Center"
-                                 MinWidth="200"
-                                 MaxLength="19"
-                                 IsEnabled="{Binding IsDiscordAvaible}"
-                                 Text="{Binding CurrentChannelId}" />
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding RefreshUsersInChannelCommand}">
-                            <controls:SymbolIcon Symbol="Sync" FontSize="18" />
-                        </Button>
-                    </StackPanel>
-                </DockPanel>
 
-                <ItemsControl
+                <views:HeaderView
+                    Margin="0 0 0 10"
+                    Grid.ColumnSpan="2" />
+
+                <views:UsersListView
                     Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     ItemsSource="{Binding Users}"
-                    ItemTemplate="{StaticResource User}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel
-                                Margin="10 5"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Stretch" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
+                    ItemTemplate="{StaticResource UserItem}" />
 
-                <Grid Grid.Row="2" Grid.Column="1"
-                      Margin="10 0 0 0"
-                      HorizontalAlignment="Right"
-                      RowDefinitions="Auto Auto Auto Auto Auto"
-                      VerticalAlignment="Bottom"
-                      ColumnDefinitions="* *">
-                    <Button Grid.Column="0"
-                            Grid.Row="0"
-                            Margin="0 0 10 0"
-                            HorizontalAlignment="Stretch"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding NewTeamCommand}">
-                        Add Team
-                    </Button>
-                    <Button Grid.Column="1"
-                            Grid.Row="0"
-                            HorizontalAlignment="Stretch"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding ShuffleCommand}">
-                        Shuffle
-                    </Button>
-                    <Button Grid.Column="0"
-                            Grid.Row="1"
-                            HorizontalAlignment="Stretch"
-                            Margin="0 10 10 10"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding MuteAllCommand}">
-                        Mute All
-                    </Button>
-                    <Button Grid.Column="1"
-                            Grid.Row="1"
-                            HorizontalAlignment="Stretch"
-                            Margin="0 10"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding MoveAllCommand}">
-                        Move all
-                    </Button>
-                    <controls:FAComboBox
-                        IsTextSearchEnabled="True"
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        SelectedItem="{Binding MessageTextChannel}"
-                        ItemsSource="{Binding GuildTextChannels}"
-                        HorizontalAlignment="Stretch">
-                        <controls:FAComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </controls:FAComboBox.ItemTemplate>
-                    </controls:FAComboBox>
-                    <Button Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            Grid.Row="3"
-                            HorizontalAlignment="Stretch"
-                            Margin="0 10  0  0"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding SendMessageCommand}">
-                        Send To Chat
-                    </Button>
-                    <Button Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            Grid.Row="4"
-                            Classes="accent"
-                            HorizontalAlignment="Stretch"
-                            Margin="0 10"
-                            IsEnabled="{Binding IsDiscordAvaible}"
-                            Command="{Binding ReturnAllCommand}">
-                        Return All
-                    </Button>
-                </Grid>
+                <views:ButtonPalleteView Grid.Row="2" Grid.Column="1"
+                                         Margin="10 0 0 0"
+                                         HorizontalAlignment="Right"
+                                         RowDefinitions="Auto Auto Auto Auto Auto"
+                                         VerticalAlignment="Bottom"
+                                         ColumnDefinitions="* *" />
 
-                <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="0 10">
-                    <ItemsControl ItemsSource="{Binding Teams}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#1e1e1e"
-                                        Margin="5"
-                                        CornerRadius="10">
-                                    <StackPanel Width="300"
-                                                Margin="10">
-                                        <TextBlock
-                                            Text="{Binding Name}"
-                                            Theme="{StaticResource BodyStrongTextBlockStyle}"
-                                            HorizontalAlignment="Center" />
-                                        <Separator Margin="20 5" />
-                                        <Grid ColumnDefinitions="4* *"
-                                              Margin="10"
-                                              HorizontalAlignment="Stretch">
-                                            <controls:FAComboBox
-                                                IsTextSearchEnabled="True"
-                                                SelectedValue="{Binding Channel}"
-                                                ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).GuildVoiceChannels,ElementName=Window}"
-                                                HorizontalAlignment="Stretch">
-                                                <controls:FAComboBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding Name}"></TextBlock>
-                                                    </DataTemplate>
-                                                </controls:FAComboBox.ItemTemplate>
-                                            </controls:FAComboBox>
-                                            <Button Grid.Column="1"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Stretch"
-                                                    Command="{Binding ((vm:MainWindowViewModel)DataContext).RemoveTeamCommand,ElementName=Window}"
-                                                    CommandParameter="{Binding .}"
-                                                    Classes="accent"
-                                                    IsEnabled="{Binding ((vm:MainWindowViewModel)DataContext).IsDiscordAvaible,ElementName=Window}"
-                                                    Margin="10 0 0 0">
-                                                <controls:SymbolIcon Symbol="Cancel" />
-                                            </Button>
-                                        </Grid>
-
-                                        <ItemsControl ItemsSource="{Binding Users}"
-                                                      Margin="10"
-                                                      ItemTemplate="{StaticResource UserListItem}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Vertical" Spacing="10" />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                        </ItemsControl>
-
-                                        <Grid ColumnDefinitions="* * *"
-                                              Margin="10"
-                                              HorizontalAlignment="Stretch">
-                                            <Button Grid.Column="0"
-                                                    HorizontalAlignment="Stretch"
-                                                    Classes.accent="{Binding Blocked}"
-                                                    IsEnabled="{Binding ((vm:MainWindowViewModel)DataContext).IsDiscordAvaible,ElementName=Window}"
-                                                    Command="{ Binding ((vm:MainWindowViewModel)DataContext).BlockTeamCommand,ElementName=Window}"
-                                                    CommandParameter="{Binding .}"
-                                                    VerticalAlignment="Stretch">
-                                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                                    <TextBlock
-                                                        Classes.Blocked="{Binding Blocked}"
-                                                        Classes.NotBlocked="{Binding !Blocked}">
-                                                        <TextBlock.Styles>
-                                                            <Style Selector="TextBlock.Blocked">
-                                                                <Setter Property="Text" Value="Unblock" />
-                                                            </Style>
-                                                            <Style Selector="TextBlock.NotBlocked">
-                                                                <Setter Property="Text" Value="Block" />
-                                                            </Style>
-                                                        </TextBlock.Styles>
-                                                    </TextBlock>
-                                                    <controls:SymbolIcon Symbol="ReportHacked"
-                                                                         IsVisible="{Binding Blocked}" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Grid.Column="1"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Stretch"
-                                                    IsEnabled="{Binding ((vm:MainWindowViewModel)DataContext).IsDiscordAvaible,ElementName=Window}"
-                                                    Command="{ Binding ((vm:MainWindowViewModel)DataContext).MuteTeamCommand,ElementName=Window}"
-                                                    CommandParameter="{Binding .}"
-                                                    Margin="10 0 0 0">
-                                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                                    <TextBlock>Mute</TextBlock>
-                                                    <controls:SymbolIcon Symbol="SpeakerMuteFilled" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Grid.Column="2"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Stretch"
-                                                    IsEnabled="{Binding ((vm:MainWindowViewModel)DataContext).IsDiscordAvaible,ElementName=Window}"
-                                                    Command="{ Binding ((vm:MainWindowViewModel)DataContext).MoveTeamCommand,ElementName=Window}"
-                                                    CommandParameter="{Binding .}"
-                                                    Margin="10 0 0 0">
-                                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                                    <TextBlock>Move</TextBlock>
-                                                    <controls:SymbolIcon Symbol="Go" />
-                                                </StackPanel>
-                                            </Button>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                <views:TeamListView Grid.Column="0" Grid.Row="2" Margin="0 10" />
             </Grid>
         </dialogHostAvalonia:DialogHost>
     </dialogHostAvalonia:DialogHost>

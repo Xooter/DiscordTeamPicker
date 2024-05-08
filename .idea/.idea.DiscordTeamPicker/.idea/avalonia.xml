@@ -4,8 +4,15 @@
     <option name="projectPerEditor">
       <map>
         <entry key="DiscordTeamPicker/App.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/ButtonPalleteView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/HeaderView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/MainWindow.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/Resource/ListUser.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/Resource/User.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/Resources/ListUser.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/TeamListView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/TokenDialog.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/UsersListView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
       </map>
     </option>
   </component>
