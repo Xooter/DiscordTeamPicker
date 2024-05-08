@@ -27,7 +27,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] SocketTextChannel? _messageTextChannel;
 
-    private Config? config { get; set; }
+    private Config? Config { get; set; }
     [ObservableProperty] private string? _currentChannelId;
     [ObservableProperty] private Bitmap _guildAvatar;
 
@@ -39,67 +39,88 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _errorDialogOpen;
     [ObservableProperty] private string _errorText = "";
 
+    [ObservableProperty]
+    private bool _badToken;
+
     
     public MainWindowViewModel()
     {
         var configManager = new SecretManager("config.json");
-        config = configManager.LoadConfig();
+        Config = configManager.LoadConfig();
+        
+        if(Config != null){
+            TokenValueInput = Config.Token;
+            CurrentChannelId = Config.CurrentChannelId.ToString();
+        }
         
         
         InitDiscordApi();
     }
 
+    private async Task ClientOnLog(LogMessage arg)
+    {
+        if (arg.Exception != null && (arg.Exception.Message.Contains("Closed") ||  arg.Exception.Message.Contains("Unauthorized")) && !BadToken)
+        {
+            BadToken = true;
+            IsDiscordAvaible = false;
+            await _client.StopAsync();
+            OpenErrorDialog("Invalid token");   
+        }
+    }
+
     private async void InitDiscordApi()
     {
-        IsDiscordAvaible = config.Token != null;
-        
-        if(config.Token == null) return;
+        BadToken = false;
 
-        TokenValueInput = config.Token;
-        
+        if (Config.Token == null)
+        {
+            IsDiscordAvaible = false;
+            return;
+        }
+
         _client = new DiscordSocketClient();
-
-        CurrentChannelId = config.CurrentChannelId.ToString();
-        
-        await _client.LoginAsync(TokenType.Bot, config?.Token);
-        await _client.StartAsync();
         _client.Ready += ClientOnReady;
+        _client.Log += ClientOnLog; 
+        
+        await _client.LoginAsync(TokenType.Bot, Config?.Token);
+        await _client.StartAsync();
     }
 
     private Task ClientOnReady()
     {
+        IsDiscordAvaible = true;
         RefreshUsersInChannel();
         return Task.CompletedTask;
     }
 
     partial void OnTokenValueInputChanged(string value)
     {
-        config.Token = value;
+        Config.Token = value;
         var configManager = new SecretManager("config.json");
-        configManager.SaveConfig(config);
+        configManager.SaveConfig(Config);
     }
     
     partial void OnCurrentChannelIdChanged(string value)
     {
         var configManager = new SecretManager("config.json");
         if(ulong.TryParse(value,out ulong id))
-            config.CurrentChannelId = id;
-        configManager.SaveConfig(config);
+            Config.CurrentChannelId = id;
+        configManager.SaveConfig(Config);
     }
 
     partial void OnMessageTextChannelChanged(SocketTextChannel value)
     {
         var configManager = new SecretManager("config.json");
-        config.TextChannelId = value.Id;
-        configManager.SaveConfig(config);
+        Config.TextChannelId = value.Id;
+        configManager.SaveConfig(Config);
     }
 
     [RelayCommand]
     void RefreshUsersInChannel()
     {
-        if(config.CurrentChannelId == 0) return;
-        GetUserInChannel(config.CurrentChannelId);
-        GetGuildChannels(config.CurrentChannelId);
+        if(Config.CurrentChannelId == 0) return;
+        GetUserInChannel(Config.CurrentChannelId);
+        GetGuildChannels(Config.CurrentChannelId);
     }
 
     private async void GetGuildChannels(ulong channelId)
@@ -139,7 +160,7 @@ public partial class MainWindowViewModel : ViewModelBase
             GuildTextChannels.Add(chan);
         }
 
-        if(config != null && config.TextChannelId != 0 && await _client.GetChannelAsync(config.TextChannelId) is SocketTextChannel channelText)
+        if(Config != null && Config.TextChannelId != 0 && await _client.GetChannelAsync(Config.TextChannelId) is SocketTextChannel channelText)
             MessageTextChannel = channelText;
         if (GuildTextChannels.Count > 0 && MessageTextChannel == null)
             MessageTextChannel = GuildTextChannels.First();
@@ -373,6 +394,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OpenErrorDialog(string errorMessage)
     {
+        IsDiscordAvaible = false;
         ErrorText = errorMessage;
         ErrorDialogOpen = true;
     }

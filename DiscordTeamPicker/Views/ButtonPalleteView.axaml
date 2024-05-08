@@ -43,6 +43,7 @@
         Grid.Row="2"
         Grid.Column="0"
         Grid.ColumnSpan="2"
+        IsEnabled="{Binding IsDiscordAvaible}"
         SelectedItem="{Binding MessageTextChannel}"
         ItemsSource="{Binding GuildTextChannels}"
         HorizontalAlignment="Stretch">

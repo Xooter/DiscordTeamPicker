@@ -30,11 +30,11 @@
                  VerticalAlignment="Center"
                  MinWidth="200"
                  MaxLength="19"
-                 IsEnabled="{Binding IsDiscordAvaible}"
+                 IsEnabled="{Binding !BadToken}"
                  Text="{Binding CurrentChannelId}" />
         <Button
             HorizontalAlignment="Stretch"
-            IsEnabled="{Binding IsDiscordAvaible}"
+            IsEnabled="{Binding !BadToken}"
             Command="{Binding RefreshUsersInChannelCommand}">
             <controls:SymbolIcon Symbol="Sync" FontSize="18" />
         </Button>
