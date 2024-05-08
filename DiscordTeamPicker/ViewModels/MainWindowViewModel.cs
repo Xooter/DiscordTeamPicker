@@ -94,6 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private  void GetBotVoiceChannels()
     {
+        BotVoiceChanels.Clear();
         foreach (var guild in _client.Guilds)
         {
             var channels= guild.VoiceChannels;
@@ -257,6 +258,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void Shuffle()
     {
+        if(Teams.Count == 0 || Users.Count == 0) return;
         foreach (var team in Teams)
         {
             if (!team.Blocked)
@@ -333,6 +335,18 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     
     [RelayCommand]
+    async Task DemuteAll()
+    {
+        foreach (var team in Teams)
+        {
+            foreach (var user in team.Users)
+            {
+                await user.User?.ModifyAsync(x => x.Mute = false)!;
+            }
+        }
+    }
+    
+    [RelayCommand]
     async Task MoveTeam(Team team)
     {
         foreach (var user in team.Users)
@@ -366,6 +380,12 @@ public partial class MainWindowViewModel : ViewModelBase
                 Channel = selectedChannel
             });
         }
+    }
+    
+    [RelayCommand]
+    void RemoveAllTeams()
+    {
+        Teams.Clear();
     }
 
     [RelayCommand]

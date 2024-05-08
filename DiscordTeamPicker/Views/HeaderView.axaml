@@ -7,18 +7,28 @@
            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
            x:DataType="viewModels:MainWindowViewModel"
            x:Class="DiscordTeamPicker.Views.HeaderView">
-    <Button
-        VerticalAlignment="Center"
-        Command="{Binding OpenTokenDialogCommand}"
-        DockPanel.Dock="Right"
-        Classes="accent">
-        <controls:SymbolIcon Symbol="Permissions" FontSize="18" />
-    </Button>
+    <StackPanel Orientation="Horizontal"
+                Spacing="20"
+                DockPanel.Dock="Right">
+        <Button
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding !BadToken}"
+            Command="{Binding RefreshUsersInChannelCommand}">
+            <controls:SymbolIcon Symbol="Sync" FontSize="18" />
+        </Button>
+        <Button
+            VerticalAlignment="Center"
+            Command="{Binding OpenTokenDialogCommand}"
+            Classes="accent">
+            <controls:SymbolIcon Symbol="Permissions" FontSize="18" />
+        </Button>
+    </StackPanel>
     <StackPanel Orientation="Horizontal"
                 Spacing="20">
         <Border ClipToBounds="True"
                 CornerRadius="20"
                 Height="80"
+                Background="{StaticResource AccentButtonBackground}"
                 Width="80">
             <Image
                 Width="80"
@@ -26,6 +36,11 @@
                 Source="{Binding GuildAvatar}"
                 Stretch="UniformToFill" />
         </Border>
+        <StackPanel
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            >
+         <Label>Current Channel</Label>   
         <controls:FAComboBox
             IsTextSearchEnabled="True"
             MinWidth="200"
@@ -33,22 +48,17 @@
             IsEnabled="{Binding !BadToken}"
             SelectedItem="{Binding CurrentChannel}"
             ItemsSource="{Binding BotVoiceChanels}"
-            HorizontalAlignment="Stretch">
+            >
             <controls:FAComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Spacing="2">
-                        <controls:SymbolIcon Symbol="Contact"/>
+                        <controls:SymbolIcon Symbol="Contact" />
                         <TextBlock Text="{Binding ConnectedUsers.Count,StringFormat='{}{0} |'}" />
                         <TextBlock Text="{Binding Name}" />
                     </StackPanel>
                 </DataTemplate>
             </controls:FAComboBox.ItemTemplate>
         </controls:FAComboBox>
-        <Button
-            HorizontalAlignment="Stretch"
-            IsEnabled="{Binding !BadToken}"
-            Command="{Binding RefreshUsersInChannelCommand}">
-            <controls:SymbolIcon Symbol="Sync" FontSize="18" />
-        </Button>
+        </StackPanel>
     </StackPanel>
 </DockPanel>

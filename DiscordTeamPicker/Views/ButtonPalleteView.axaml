@@ -13,34 +13,83 @@
             HorizontalAlignment="Stretch"
             IsEnabled="{Binding IsDiscordAvaible}"
             Command="{Binding NewTeamCommand}">
-        Add Team
+        <StackPanel Orientation="Horizontal"  Spacing="2">
+            <controls:SymbolIcon Symbol="Add"/>
+            <TextBlock>Team</TextBlock>  
+        </StackPanel>
     </Button>
     <Button Grid.Column="1"
             Grid.Row="0"
             HorizontalAlignment="Stretch"
             IsEnabled="{Binding IsDiscordAvaible}"
-            Command="{Binding ShuffleCommand}">
-        Shuffle
+            Command="{Binding RemoveAllTeamsCommand}">
+        <StackPanel Orientation="Horizontal"  Spacing="2">
+            <controls:SymbolIcon Symbol="Cancel"/>
+            <TextBlock>Team</TextBlock>  
+        </StackPanel>
     </Button>
     <Button Grid.Column="0"
+            Grid.ColumnSpan="2"
             Grid.Row="1"
+            Classes="accent"
+            Margin="0 10 0 0"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding ShuffleCommand}">
+        <StackPanel Orientation="Horizontal"  Spacing="2">
+            <TextBlock>Shuffle</TextBlock>  
+            <controls:SymbolIcon Symbol="Sync"/>
+        </StackPanel>
+    </Button>
+    <Button Grid.Column="0"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            Margin="0 10 10 0"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding MuteAllCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="2">
+            <TextBlock>Mute</TextBlock>  
+            <controls:SymbolIcon Symbol="SpeakerMuteFilled"/>
+        </StackPanel>
+    </Button>
+    <Button Grid.Column="1"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            Margin="0 10 0 0"
+            IsEnabled="{Binding IsDiscordAvaible}"
+            Command="{Binding DemuteAllCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="2">
+            <TextBlock>Demute</TextBlock>  
+            <controls:SymbolIcon Symbol="Speaker2Filled"/>
+        </StackPanel>
+    </Button>
+    <Button Grid.Column="0"
+            Grid.Row="3"
             HorizontalAlignment="Stretch"
             Margin="0 10 10 10"
             IsEnabled="{Binding IsDiscordAvaible}"
-            Command="{Binding MuteAllCommand}">
-        Mute All
+            Command="{Binding MoveAllCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="2">
+            <TextBlock>Move</TextBlock>  
+            <controls:SymbolIcon Symbol="Go"/>
+        </StackPanel>
     </Button>
     <Button Grid.Column="1"
-            Grid.Row="1"
+            Grid.Row="3"
+            Classes="accent"
             HorizontalAlignment="Stretch"
-            Margin="0 10"
+            Margin="0 10 0 10"
             IsEnabled="{Binding IsDiscordAvaible}"
-            Command="{Binding MoveAllCommand}">
-        Move all
+            Command="{Binding ReturnAllCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="2">
+            <TextBlock>Return</TextBlock>  
+            <controls:SymbolIcon Symbol="Go"/>
+        </StackPanel>
     </Button>
+    
     <controls:FAComboBox
         IsTextSearchEnabled="True"
-        Grid.Row="2"
+        Grid.Row="4"
         Grid.Column="0"
         Grid.ColumnSpan="2"
         IsEnabled="{Binding IsDiscordAvaible}"
@@ -55,21 +104,14 @@
     </controls:FAComboBox>
     <Button Grid.Column="0"
             Grid.ColumnSpan="2"
-            Grid.Row="3"
+            Grid.Row="5"
             HorizontalAlignment="Stretch"
             Margin="0 10  0  0"
             IsEnabled="{Binding IsDiscordAvaible}"
             Command="{Binding SendMessageCommand}">
-        Send To Chat
-    </Button>
-    <Button Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Grid.Row="4"
-            Classes="accent"
-            HorizontalAlignment="Stretch"
-            Margin="0 10"
-            IsEnabled="{Binding IsDiscordAvaible}"
-            Command="{Binding ReturnAllCommand}">
-        Return All
+        <StackPanel  Orientation="Horizontal" Spacing="2">
+            <TextBlock>Send Chat</TextBlock>  
+            <controls:SymbolIcon Symbol="LeaveChat"/>
+        </StackPanel>
     </Button>
 </Grid>
