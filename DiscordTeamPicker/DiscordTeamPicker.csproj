@@ -30,4 +30,11 @@
     <PackageReference Include="Discord.Net.Rest" Version="3.14.1" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\TeamListView.axaml.cs">
+      <DependentUpon>TeamListView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

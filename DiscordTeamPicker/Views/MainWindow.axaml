@@ -118,9 +118,7 @@
                 <views:UsersListView
                     Grid.Row="1"
                     Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    ItemsSource="{Binding Users}"
-                    ItemTemplate="{StaticResource UserItem}" />
+                    Grid.ColumnSpan="2" />
 
                 <views:ButtonPalleteView Grid.Row="2" Grid.Column="1"
                                          Margin="10 0 0 0"
@@ -129,7 +127,9 @@
                                          VerticalAlignment="Bottom"
                                          ColumnDefinitions="* *" />
 
-                <views:TeamListView Grid.Column="0" Grid.Row="2" Margin="0 10" />
+                <views:TeamListView Grid.Column="0"
+                                    Grid.Row="2" 
+                                    Margin="0 10" />
             </Grid>
         </dialogHostAvalonia:DialogHost>
     </dialogHostAvalonia:DialogHost>

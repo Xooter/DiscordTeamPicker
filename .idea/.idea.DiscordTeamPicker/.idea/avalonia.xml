@@ -10,6 +10,7 @@
         <entry key="DiscordTeamPicker/Views/Resource/ListUser.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/Resource/User.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/Resources/ListUser.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
+        <entry key="DiscordTeamPicker/Views/TeamCard/TeamHeader.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/TeamListView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/TokenDialog.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />
         <entry key="DiscordTeamPicker/Views/UsersListView.axaml" value="DiscordTeamPicker/DiscordTeamPicker.csproj" />

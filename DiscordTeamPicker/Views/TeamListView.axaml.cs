@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DiscordTeamPicker.Views;
 
-public partial class TeamListView : ScrollViewer
+public partial class TeamListView : UserControl
 {
     public TeamListView()
     {

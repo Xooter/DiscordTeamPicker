@@ -320,7 +320,7 @@ public partial class MainWindowViewModel : ViewModelBase
                                     .Where(chan => Teams.All(team => team.Channel != chan) && chan.Id.ToString() != CurrentChannelId)  
                                     .ToList();
 
-            SocketGuildChannel selectedChannel = availableChannels.FirstOrDefault(); 
+            SocketVoiceChannel? selectedChannel = availableChannels.FirstOrDefault(); 
             
             Teams.Add(new Team()
             {

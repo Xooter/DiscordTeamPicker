@@ -4,7 +4,6 @@
              xmlns:local="using:DiscordTeamPicker"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-             xmlns:resource="clr-namespace:DiscordTeamPicker.Views.Resource"
              RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>

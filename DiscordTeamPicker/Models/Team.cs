@@ -14,7 +14,7 @@ public partial class Team : ViewModelBase
 
     public ObservableCollection<DiscordUser> Users { get; set; } = [];
     
-    public SocketGuildChannel Channel { get; set; }
+    public SocketVoiceChannel? Channel { get; set; }
 
     [ObservableProperty] private bool _blocked;
 }
