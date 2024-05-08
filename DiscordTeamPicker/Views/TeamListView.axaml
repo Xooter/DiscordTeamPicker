@@ -84,11 +84,11 @@
                                 </Button>
                             </Grid>
                             <StackPanel>
-                            <TextBlock
+                            <TextBox
+                                Margin="10 0"
                                 Text="{Binding Name}"
-                                Theme="{StaticResource BodyStrongTextBlockStyle}"
-                                HorizontalAlignment="Center" />
-                            <Separator Margin="20 5" />
+                                TextAlignment="Center"
+                                HorizontalAlignment="Stretch" />
                             <Grid ColumnDefinitions="4* *"
                                   Margin="10"
                                   HorizontalAlignment="Stretch">
