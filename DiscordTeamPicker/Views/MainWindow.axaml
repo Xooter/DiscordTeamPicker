@@ -25,12 +25,12 @@
                         HorizontalAlignment="Left"
                         Orientation="Horizontal">
                 <Border ClipToBounds="True"
-                        CornerRadius="20"
-                        Height="80"
-                        Width="80">
+                        CornerRadius="16"
+                        Height="64"
+                        Width="64">
                     <Image
-                        Width="80"
-                        Height="80"
+                        Width="64"
+                        Height="64"
                         Stretch="UniformToFill"
                         Source="{Binding Avatar}" />
                 </Border>
