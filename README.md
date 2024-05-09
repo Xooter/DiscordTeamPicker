@@ -1,7 +1,7 @@
 ___
 # Discord Team Generator
 
-| :exclamation:  Im too Lazy :p  |
+### :exclamation:  Im too Lazy :p 
 > This project aims to be a short, lazy effort. Minor issues will not be addressed, and the solution will be approached in the laziest manner possible.
 
 This is an Avalonia-based program that automatically generates teams on Discord using the Discord API.
@@ -24,8 +24,7 @@ This is an Avalonia-based program that automatically generates teams on Discord 
 
 Contributions are welcome! If you want to improve this program, please create a pull request explaining your changes.
 
-| :point_up:  This is very important   |
-> **Note:** Make sure to keep your bot token secure and do not share it publicly.
+> :exclamation: **Note:** Make sure to keep your bot token secure and do not share it publicly.
 
 ### And now, a poem:
 ```
