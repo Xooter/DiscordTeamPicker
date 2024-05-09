@@ -1,8 +1,31 @@
 ___
+# Discord Team Generator
 
->**Note:** <br>
+| :exclamation:  Im too Lazy :p  |
 > This project aims to be a short, lazy effort. Minor issues will not be addressed, and the solution will be approached in the laziest manner possible.
 
+This is an Avalonia-based program that automatically generates teams on Discord using the Discord API.
+
+## Requirements
+
+- **Discord Bot**: You need to have a Discord bot set up on your server with the necessary permissions to create roles and text/voice channels. You can obtain a token for your bot from the Discord developer portal.
+
+## Screenshots
+
+![image](DiscordTeamPicker/images/image.png)
+
+![image](DiscordTeamPicker/images/image2.png)
+
+![image](DiscordTeamPicker/images/image3.png)
+
+![image](DiscordTeamPicker/images/image4.png)
+
+## Contributions
+
+Contributions are welcome! If you want to improve this program, please create a pull request explaining your changes.
+
+| :point_up:  This is very important   |
+> **Note:** Make sure to keep your bot token secure and do not share it publicly.
 
 ### And now, a poem:
 ```
